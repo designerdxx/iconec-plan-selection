@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Iconec plan selection: live, tappable iPhone screens for Message A and B, the checkout bar and the promo code sheet.">
+<meta name="description" content="Iconec plan selection: live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet and a calmer two-step A.">
 <meta property="og:title" content="Iconec · Plan selection">
-<meta property="og:description" content="Live, tappable iPhone screens for Message A and B, the checkout bar and the promo code sheet.">
+<meta property="og:description" content="Live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet and a calmer two-step A.">
 <meta name="theme-color" content="#ecede9">
 <title>Iconec · Plan selection</title>
 <style>
@@ -393,6 +393,55 @@ svg { display: block; }
 .pinbar-total p:first-child span { font-size: 14px; font-weight: 400; }
 .pinbar .cta { width: 132px; height: 52px; }
 
+
+/* ---------- Calm A: two steps, one decision per screen ----------
+   Neutral ink does the work; the only colour is the percentage and the button.
+   No shimmer, no green tiles; the photos still follow the plan. */
+.calm-stack { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.calm-pane {
+  position: absolute; inset: 0; display: flex; flex-direction: column; background: #ffffff;
+  transition: transform var(--dur-move) var(--ease-out), opacity var(--dur-move) var(--ease-out);
+}
+.calm-pane.is-next { transform: translateX(100%); }
+.scr[data-step="2"] .calm-pane.is-first { transform: translateX(-28%); opacity: 0.4; }
+.scr[data-step="2"] .calm-pane.is-next { transform: none; box-shadow: -8px 0 24px -12px rgba(0, 0, 0, 0.18); }
+.calm-main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding: 8px 20px 34px; }
+.calm-piece { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; }
+.calm-piece h1 { font-size: 18px; line-height: 24px; font-weight: 500; letter-spacing: -0.01em; }
+.calm-piece h1 span { font-weight: 400; color: #5c5c5c; }
+.calm-retail { font-size: 14px; line-height: 20px; color: #5c5c5c; font-variant-numeric: tabular-nums; }
+.calm-claim { margin-top: 28px; font-size: 22px; line-height: 28px; font-weight: 500; letter-spacing: -0.02em; color: #0a0a0a; }
+.calm-num { color: #284423; font-variant-numeric: tabular-nums; }
+.calm-list { margin-top: 16px; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.09); overflow: hidden; }
+.calm-row {
+  width: 100%; height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  border: 0; background: transparent; text-align: left; cursor: pointer;
+  transition: background-color var(--dur-state) ease;
+}
+.calm-row + .calm-row { box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.06); }
+.calm-row:active { background: #f6f7f5; }
+.calm-radio { width: 22px; height: 22px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.24); display: grid; place-items: center; transition: box-shadow var(--dur-state) ease; }
+.calm-radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #102c0b; transform: scale(0); transition: transform var(--dur-state) var(--ease-out); }
+.calm-row[aria-checked="true"] .calm-radio { box-shadow: inset 0 0 0 1.5px #102c0b; }
+.calm-row[aria-checked="true"] .calm-radio::after { transform: scale(1); }
+.calm-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.calm-row-name { font-size: 16px; line-height: 22px; font-weight: 500; }
+.calm-row-sub { font-size: 13px; line-height: 18px; color: #5c5c5c; }
+.calm-row-price { font-size: 16px; line-height: 22px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.calm-row-price small { font-size: 14px; font-weight: 400; color: #5c5c5c; }
+
+.calm-bar { height: 44px; flex-shrink: 0; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; padding: 0 8px; }
+.calm-bar h2 { margin: 0; text-align: center; font-size: 17px; line-height: 22px; font-weight: 500; }
+.calm-summary { margin-top: 8px; display: flex; align-items: center; gap: 14px; }
+.calm-thumb { width: 56px; height: 56px; flex: none; border-radius: 12px; object-fit: cover; object-position: 50% 30%; background: #2a2b2d; }
+.calm-sum-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.calm-sum-name { font-size: 16px; line-height: 22px; font-weight: 500; }
+.calm-sum-sub { font-size: 14px; line-height: 20px; color: #5c5c5c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.calm-change { height: 44px; padding: 0 4px; border: 0; background: transparent; font-size: 15px; font-weight: 500; color: #284423 !important; cursor: pointer; }
+.calm-rule { height: 1px; margin: 24px 0 0; background: rgba(0, 0, 0, 0.07); border: 0; }
+.calm-included { margin-top: 20px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 20px; color: #3a3a3a; }
+.calm-included li { display: flex; align-items: center; gap: 12px; }
+.calm-included svg { flex: none; }
 
 /* ---------- Promo code sheet: an iOS inset sheet that rides on top of the keyboard ---------- */
 .sheet-layer { position: absolute; inset: 0; z-index: 4; pointer-events: none; visibility: hidden; transition: visibility 0s linear 220ms; }
@@ -786,6 +835,145 @@ const PhoneScreens = (() => {
   const SPINNER = `<svg class="ios-spinner" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">${Array.from({ length: 8 }, (_, i) => `<rect x="9" y="1.5" width="2" height="5" rx="1" fill="#fff" opacity="${(0.25 + (i / 8) * 0.75).toFixed(2)}" transform="rotate(${i * 45} 10 10)"/>`).join("")}</svg>`;
   const CHECK = `<svg class="apply-check" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 11.5l3.8 3.8L16.5 7.5"/></svg>`;
 
+  // Promo code sheet behaviour, shared by every screen that has the promo row.
+  // `refresh` re-renders the screen's totals after a code is applied or removed.
+  function attachPromo(el, refresh) {
+    const q = (r) => [...el.querySelectorAll(`[data-r="${r}"]`)];
+    const set = (r, text) => q(r).forEach((n) => { n.textContent = text; });
+    const input = q("input")[0], field = q("field")[0], applyBtn = q("apply")[0], layer = q("sheetLayer")[0], sheet = q("sheet")[0];
+    let applied = null, checking = 0, busy = false;
+    const canFocus = () => !el.closest("[inert]");
+    function syncField() {
+      applyBtn.disabled = !input.value.trim();
+      q("clear")[0].hidden = !input.value;
+    }
+    function setError(text, shake = true) {
+      field.classList.remove("is-invalid");
+      if (text) {
+        void field.offsetWidth;
+        field.classList.add("is-invalid");
+        field.style.animation = shake ? "" : "none";
+      }
+      q("msg")[0].hidden = !text;
+      set("msgText", text || "");
+    }
+    function setApplyState(state) {
+      busy = state !== "idle";
+      applyBtn.setAttribute("aria-busy", String(state === "loading"));
+      applyBtn.innerHTML = state === "loading" ? SPINNER : state === "done" ? CHECK : "Apply";
+      applyBtn.setAttribute("aria-label", state === "loading" ? "Checking code" : state === "done" ? "Code applied" : "Apply");
+    }
+    function openSheet() {
+      if (applied) input.value = applied;
+      setError(null);
+      syncField();
+      layer.classList.add("is-open");
+      if (canFocus()) setTimeout(() => input.focus({ preventScroll: true }), 80);
+    }
+    function closeSheet() {
+      if (!layer.classList.contains("is-open")) return false;
+      clearTimeout(checking);
+      setApplyState("idle");
+      input.blur();
+      layer.classList.remove("is-open");
+      return true;
+    }
+    function applyCode() {
+      const code = input.value.trim().toUpperCase();
+      if (!code || busy) return;
+      setError(null);
+      setApplyState("loading");
+      checking = setTimeout(() => {
+        if (code !== PROMO_CODE) {
+          setApplyState("idle");
+          setError(`${code} isn’t a valid code. Check the spelling, or try another.`);
+          return;
+        }
+        // One thing moves at a time: the tick, then the sheet leaves, then the total drops.
+        setApplyState("done");
+        checking = setTimeout(() => {
+          closeSheet();
+          applied = code;
+          checking = setTimeout(refresh, reduceMotion ? 0 : 200);
+        }, reduceMotion ? 0 : 320);
+      }, reduceMotion ? 0 : 650);
+    }
+    function pressKey(k) {
+      if (k === "del") input.value = input.value.slice(0, -1);
+      else if (k === "done") { applyCode(); return; }
+      else if (k === "space") input.value += " ";
+      else if (k.length === 1 && input.value.length < 20) input.value += k;
+      else return;
+      setError(null);
+      syncField();
+    }
+
+    input.addEventListener("input", () => { setError(null); syncField(); });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); applyCode(); } });
+    // Keys keep the field focused, like the system keyboard.
+    layer.addEventListener("pointerdown", (e) => { if (e.target.closest(".kb-key")) e.preventDefault(); });
+
+    // Pull the sheet down by its top to dismiss it.
+    let pull = null;
+    sheet.addEventListener("pointerdown", (e) => {
+      if (!e.target.closest(".grabber, .sheet-head") || e.target.closest("button")) return;
+      pull = { y: e.clientY, dy: 0, s: el.getBoundingClientRect().width / 402 };
+      sheet.classList.add("is-dragging");
+      sheet.setPointerCapture(e.pointerId);
+    });
+    sheet.addEventListener("pointermove", (e) => {
+      if (!pull) return;
+      pull.dy = Math.max(0, (e.clientY - pull.y) / pull.s);
+      sheet.style.transform = `translateY(${pull.dy}px)`;
+    });
+    const endPull = () => {
+      if (!pull) return;
+      const far = pull.dy > 80;
+      pull = null;
+      sheet.classList.remove("is-dragging");
+      sheet.style.transform = "";
+      if (far) closeSheet();
+    };
+    sheet.addEventListener("pointerup", endPull);
+    sheet.addEventListener("pointercancel", endPull);
+
+    el.addEventListener("click", (e) => {
+      if (e.target.closest('[data-r="promoOpen"]')) openSheet();
+      if (e.target.closest('[data-r="promoClear"]')) { applied = null; input.value = ""; refresh(); }
+      if (e.target.closest('[data-r="sheetClose"], [data-r="scrim"]')) closeSheet();
+      if (e.target.closest('[data-r="clear"]')) { e.preventDefault(); input.value = ""; setError(null); syncField(); if (canFocus()) input.focus(); }
+      if (e.target.closest('[data-r="apply"]')) applyCode();
+      const kbKey = e.target.closest(".kb-key");
+      if (kbKey) pressKey(kbKey.dataset.k);
+    });
+
+    return {
+      get applied() { return applied; },
+      dismiss: closeSheet,
+      // Canvas states for the promo flow start already in place (no entrance motion).
+      preset(state) {
+        if (state === "applied") applied = PROMO_CODE;
+        else if (state) {
+          input.value = state === "typing" ? "WELCOME1" : state === "invalid" ? "SPRING25" : "";
+          syncField();
+          if (state === "invalid") setError("SPRING25 isn’t a valid code. Check the spelling, or try another.", false);
+          layer.classList.add("is-open");
+        }
+      },
+      // Row, struck-through original and first payment for the plan's monthly price.
+      render(due, animate) {
+        const first = applied ? Math.round(amount(due) * (1 - PROMO_OFF) * 100) / 100 : amount(due);
+        q("first").forEach((n) => roll(n, money(first), animate));
+        q("due").forEach((n) => roll(n, due, false));
+        q("dueWas").forEach((n) => { n.hidden = !applied; n.textContent = due; });
+        q("promoRow").forEach((r) => r.classList.toggle("is-applied", !!applied));
+        q("promoLabel").forEach((n) => { n.innerHTML = applied ? `${applied}<small>${PROMO_NOTE}</small>` : "Promo code"; });
+        q("promoClear").forEach((b) => b.setAttribute("aria-label", applied ? `Remove code ${applied}` : "Remove code"));
+      },
+      destroy() { clearTimeout(checking); },
+    };
+  }
+
   function plan({ plan: startPlan = "single", message: startMessage = "a", footer = "flat", promo: promoPreset = null, onChange } = {}) {
     const el = document.createElement("div");
     el.className = "scr";
@@ -850,8 +1038,7 @@ const PhoneScreens = (() => {
     let key = PLANS[startPlan] ? startPlan : "single";
     let message = startMessage === "b" ? "b" : "a";
     let raf = 0, counting = false;
-    let applied = null, checking = 0, busy = false;
-    const input = q("input")[0], field = q("field")[0], applyBtn = q("apply")[0], layer = q("sheetLayer")[0], sheet = q("sheet")[0];
+    const promo = attachPromo(el, () => update(true));
 
     function renderClaim(fadeIn) {
       const c = document.createElement("p");
@@ -880,13 +1067,7 @@ const PhoneScreens = (() => {
       if (message === "b") q("claim")[0].setAttribute("aria-label", `Pay ${p.claimB.pct}% less than buying ${p.claimB.obj}`);
       if (!counting) q("count").forEach((n) => roll(n, p.claimB.pct + "%", animate));
       // The first payment rolls (and drops when a code is applied); the "Then …/mo" line just swaps.
-      const first = applied ? Math.round(amount(p.due) * (1 - PROMO_OFF) * 100) / 100 : amount(p.due);
-      q("first").forEach((n) => roll(n, money(first), animate));
-      q("due").forEach((n) => roll(n, p.due, false));
-      q("dueWas").forEach((n) => { n.hidden = !applied; n.textContent = p.due; });
-      q("promoRow").forEach((r) => r.classList.toggle("is-applied", !!applied));
-      q("promoLabel").forEach((n) => { n.innerHTML = applied ? `${applied}<small>${PROMO_NOTE}</small>` : "Promo code"; });
-      q("promoClear").forEach((b) => b.setAttribute("aria-label", applied ? `Remove code ${applied}` : "Remove code"));
+      promo.render(p.due, animate);
       set("cta", p.cta);
       el.querySelectorAll(".tile").forEach((t) => t.setAttribute("aria-checked", String(t.dataset.plan === key)));
     }
@@ -908,101 +1089,6 @@ const PhoneScreens = (() => {
     }
     function stopCount() { cancelAnimationFrame(raf); counting = false; }
 
-    /* ---- Promo code sheet ---- */
-    const canFocus = () => !el.closest("[inert]");
-    function syncField() {
-      applyBtn.disabled = !input.value.trim();
-      q("clear")[0].hidden = !input.value;
-    }
-    function setError(text, shake = true) {
-      field.classList.remove("is-invalid");
-      if (text) {
-        void field.offsetWidth;
-        field.classList.add("is-invalid");
-        field.style.animation = shake ? "" : "none";
-      }
-      q("msg")[0].hidden = !text;
-      set("msgText", text || "");
-    }
-    function setApplyState(state) {
-      busy = state !== "idle";
-      applyBtn.setAttribute("aria-busy", String(state === "loading"));
-      applyBtn.innerHTML = state === "loading" ? SPINNER : state === "done" ? CHECK : "Apply";
-      applyBtn.setAttribute("aria-label", state === "loading" ? "Checking code" : state === "done" ? "Code applied" : "Apply");
-    }
-    function openSheet() {
-      if (applied) input.value = applied;
-      setError(null);
-      syncField();
-      layer.classList.add("is-open");
-      if (canFocus()) setTimeout(() => input.focus({ preventScroll: true }), 80);
-    }
-    function closeSheet() {
-      if (!layer.classList.contains("is-open")) return false;
-      clearTimeout(checking);
-      setApplyState("idle");
-      input.blur();
-      layer.classList.remove("is-open");
-      return true;
-    }
-    function applyCode() {
-      const code = input.value.trim().toUpperCase();
-      if (!code || busy) return;
-      setError(null);
-      setApplyState("loading");
-      checking = setTimeout(() => {
-        if (code !== PROMO_CODE) {
-          setApplyState("idle");
-          setError(`${code} isn’t a valid code. Check the spelling, or try another.`);
-          return;
-        }
-        // One thing moves at a time: the tick, then the sheet leaves, then the total drops.
-        setApplyState("done");
-        checking = setTimeout(() => {
-          closeSheet();
-          applied = code;
-          checking = setTimeout(() => update(true), reduceMotion ? 0 : 200);
-        }, reduceMotion ? 0 : 320);
-      }, reduceMotion ? 0 : 650);
-    }
-    function pressKey(k) {
-      if (k === "del") input.value = input.value.slice(0, -1);
-      else if (k === "done") { applyCode(); return; }
-      else if (k === "space") input.value += " ";
-      else if (k.length === 1 && input.value.length < 20) input.value += k;
-      else return;
-      setError(null);
-      syncField();
-    }
-
-    input.addEventListener("input", () => { setError(null); syncField(); });
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); applyCode(); } });
-    // Keys keep the field focused, like the system keyboard.
-    layer.addEventListener("pointerdown", (e) => { if (e.target.closest(".kb-key")) e.preventDefault(); });
-
-    // Pull the sheet down by its top to dismiss it.
-    let pull = null;
-    sheet.addEventListener("pointerdown", (e) => {
-      if (!e.target.closest(".grabber, .sheet-head") || e.target.closest("button")) return;
-      pull = { y: e.clientY, dy: 0, s: el.getBoundingClientRect().width / 402 };
-      sheet.classList.add("is-dragging");
-      sheet.setPointerCapture(e.pointerId);
-    });
-    sheet.addEventListener("pointermove", (e) => {
-      if (!pull) return;
-      pull.dy = Math.max(0, (e.clientY - pull.y) / pull.s);
-      sheet.style.transform = `translateY(${pull.dy}px)`;
-    });
-    const endPull = () => {
-      if (!pull) return;
-      const far = pull.dy > 80;
-      pull = null;
-      sheet.classList.remove("is-dragging");
-      sheet.style.transform = "";
-      if (far) closeSheet();
-    };
-    sheet.addEventListener("pointerup", endPull);
-    sheet.addEventListener("pointercancel", endPull);
 
     el.addEventListener("click", (e) => {
       const tile = e.target.closest(".tile");
@@ -1012,16 +1098,9 @@ const PhoneScreens = (() => {
         update(true);
         onChange?.({ plan: key, message });
       }
-      if (e.target.closest('[data-r="promoOpen"]')) openSheet();
-      if (e.target.closest('[data-r="promoClear"]')) { applied = null; input.value = ""; update(true); }
-      if (e.target.closest('[data-r="sheetClose"], [data-r="scrim"]')) closeSheet();
-      if (e.target.closest('[data-r="clear"]')) { e.preventDefault(); input.value = ""; setError(null); syncField(); if (canFocus()) input.focus(); }
-      if (e.target.closest('[data-r="apply"]')) applyCode();
-      const kbKey = e.target.closest(".kb-key");
-      if (kbKey) pressKey(kbKey.dataset.k);
       if (e.target.closest('a[href^="#"]')) e.preventDefault();
     });
-    el.dismissSheet = closeSheet;
+    el.dismissSheet = promo.dismiss;
 
     el.setMessage = (m) => {
       if (m === message) return;
@@ -1034,21 +1113,133 @@ const PhoneScreens = (() => {
     el.getState = () => ({ plan: key, message, agreed: el.querySelector(".box-input").checked });
     el.setAgreed = (on) => { el.querySelector(".box-input").checked = on; };
 
-    // Canvas states for the promo flow start already in place (no entrance motion).
-    if (promoPreset === "applied") applied = PROMO_CODE;
-    else if (promoPreset) {
-      input.value = promoPreset === "typing" ? "WELCOME1" : promoPreset === "invalid" ? "SPRING25" : "";
-      syncField();
-      if (promoPreset === "invalid") setError("SPRING25 isn’t a valid code. Check the spelling, or try another.", false);
-      layer.classList.add("is-open");
-    }
+    promo.preset(promoPreset);
 
     renderClaim(false);
     counting = message === "b" && !reduceMotion;
     if (counting) q("count").forEach((n) => roll(n, "0%", false));
     update(false);
     countUp();
-    el.destroy = () => { stopCount(); clearTimeout(checking); };
+    el.destroy = () => { stopCount(); promo.destroy(); };
+    return el;
+  }
+
+  // Calm A: the same offer as Message A, split into "choose a plan" and "review".
+  const PLAN_SUB = { single: "1 piece at a time", duo: "2 pieces at a time", stack: "3 pieces at a time" };
+  const CALM_PERK = (d, label) => `<li><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#8a8a8a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg><span>${label}</span></li>`;
+  function calm({ plan: startPlan = "single", step: startStep = 1, onChange } = {}) {
+    const el = document.createElement("div");
+    el.className = "scr";
+    const photoH = 220;
+    el.innerHTML = `
+      ${STATUS}
+      <div class="calm-stack">
+        <section class="calm-pane is-first" data-r="pane1">
+          <div class="nav"><button type="button" class="nav-back" aria-label="Back" data-r="back">${BACK("M15 5l-7 7 7 7")}</button></div>
+          <main class="calm-main">
+            <div class="photos" role="img" data-r="photos" style="height: ${photoH}px">
+              <img class="ic-photo" data-p="riviere" src="${IMG.riviere}" alt="" draggable="false">
+              <img class="ic-photo" data-p="pendant" src="${IMG.pendant}" alt="" draggable="false">
+              <img class="ic-photo" data-p="ring" src="${IMG.ring}" alt="" draggable="false">
+            </div>
+            <div class="calm-piece">
+              <h1>Limited Edition Diamond Ring<span data-r="extra"></span></h1>
+              <p class="calm-retail"><span data-r="prefix"></span><span data-r="retail"></span> retail value</p>
+            </div>
+            <p class="calm-claim"><span data-r="pre"></span><span class="calm-num" data-r="num"></span><span data-r="post"></span></p>
+            <div class="calm-list" role="radiogroup" aria-label="Plan">
+              ${["single", "duo", "stack"].map((k) => `
+                <button type="button" class="calm-row" role="radio" aria-checked="false" data-plan="${k}">
+                  <span class="calm-radio" aria-hidden="true"></span>
+                  <span class="calm-row-text"><span class="calm-row-name">${PLANS[k].label}</span><span class="calm-row-sub">${PLAN_SUB[k]}</span></span>
+                  <span class="calm-row-price">${PLANS[k].price}<small>/mo</small></span>
+                </button>`).join("")}
+            </div>
+            <div class="grow"></div>
+            <button type="button" class="cta" data-r="next">Continue</button>
+          </main>
+        </section>
+        <section class="calm-pane is-next" data-r="pane2">
+          <div class="calm-bar">
+            <button type="button" class="nav-back" aria-label="Back to plans" data-r="prev">${BACK("M15 5l-7 7 7 7")}</button>
+            <h2>Review</h2><span></span>
+          </div>
+          <main class="calm-main">
+            <div class="calm-summary">
+              <img class="calm-thumb" src="${IMG.ring}" alt="" draggable="false">
+              <div class="calm-sum-text"><p class="calm-sum-name" data-r="sumName"></p><p class="calm-sum-sub" data-r="sumSub"></p></div>
+              <button type="button" class="calm-change" data-r="prev">Change</button>
+            </div>
+            <hr class="calm-rule">
+            <ul class="calm-included" aria-label="Included with every plan">
+              ${CALM_PERK('<path d="M3.5 7h12l-3.2-3.2"/><path d="M16.5 13h-12l3.2 3.2"/>', "Unlimited swaps")}
+              ${CALM_PERK('<path d="M10 2.5l6 2.2v4.7c0 3.8-2.6 6.5-6 8.1-3.4-1.6-6-4.3-6-8.1V4.7z"/><path d="M7.4 10.1l1.9 1.9 3.4-3.6"/>', "Damage fully covered")}
+              ${CALM_PERK('<path d="M2.5 5h9v8.5h-9z"/><path d="M11.5 8h3.3l2.7 2.8v2.7h-6"/><circle cx="6" cy="15" r="1.6" fill="#ffffff"/><circle cx="14.5" cy="15" r="1.6" fill="#ffffff"/>', "Free unlimited delivery")}
+              ${CALM_PERK('<circle cx="10" cy="10" r="7.5"/><path d="M8.2 7.6v4.8"/><path d="M11.8 7.6v4.8"/>', "Cancel or pause anytime")}
+            </ul>
+            ${PROMO.replace('class="promo"', 'class="promo" style="margin-top: 24px"')}
+            <div class="grow"></div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <p class="due-row"><span>Due once approved</span><span><span class="due-was" data-r="dueWas" hidden></span><span data-r="first"></span></span></p>
+              <p class="sub">Then <span data-r="due"></span>/mo, incl. VAT</p>
+            </div>
+            ${TERMS}
+            <button type="button" class="cta" style="margin-top: 12px" data-r="cta"></button>
+            <p class="fine" style="margin-top: 8px">Nothing is charged until your membership is approved.</p>
+          </main>
+        </section>
+      </div>
+      ${SHEET}
+      ${HOME}`;
+
+    const q = (r) => [...el.querySelectorAll(`[data-r="${r}"]`)];
+    const set = (r, text) => q(r).forEach((n) => { n.textContent = text; });
+    const imgs = Object.fromEntries([...el.querySelectorAll("[data-p]")].map((n) => [n.dataset.p, n]));
+    let key = PLANS[startPlan] ? startPlan : "single";
+    let step = startStep === 2 ? 2 : 1;
+    const promo = attachPromo(el, () => update(true));
+
+    function update(animate) {
+      const p = PLANS[key];
+      const frames = photoFrames(key, photoH);
+      for (const [name, img] of Object.entries(imgs)) {
+        const f = frames[name];
+        Object.assign(img.style, { left: f.l + "px", top: f.t + "px", width: f.w + "px", height: f.h + "px", opacity: f.o, objectPosition: centre(f, ...SOURCES[name]) });
+      }
+      q("photos")[0].setAttribute("aria-label", key === "single" ? "Limited Edition Diamond Ring" : key === "duo" ? "Limited Edition Diamond Ring beside a second piece" : "Limited Edition Diamond Ring in the centre of three pieces");
+      set("extra", p.nameExtra);
+      set("prefix", p.retailPrefix);
+      set("retail", p.retail);
+      set("pre", p.claimA.pre); set("num", p.claimA.num); set("post", p.claimA.post);
+      set("sumName", `${p.label} plan`);
+      set("sumSub", `${PLAN_SUB[key][0].toUpperCase() + PLAN_SUB[key].slice(1)} · ${p.price}/mo`);
+      set("cta", p.cta);
+      promo.render(p.due, animate);
+      el.querySelectorAll(".calm-row").forEach((r) => r.setAttribute("aria-checked", String(r.dataset.plan === key)));
+    }
+    function setStep(n) {
+      step = n;
+      el.dataset.step = String(n);
+      q("pane1")[0].inert = n === 2;
+      q("pane2")[0].inert = n === 1;
+      onChange?.({ plan: key, step });
+    }
+
+    el.addEventListener("click", (e) => {
+      const row = e.target.closest(".calm-row");
+      if (row && row.dataset.plan !== key) { key = row.dataset.plan; update(false); onChange?.({ plan: key, step }); }
+      if (e.target.closest('[data-r="next"]')) setStep(2);
+      if (e.target.closest('[data-r="prev"]')) setStep(1);
+      if (e.target.closest('a[href^="#"]')) e.preventDefault();
+    });
+    el.dismissSheet = promo.dismiss;
+    el.goBack = () => (step === 2 ? (setStep(1), true) : false);
+
+    update(false);
+    el.dataset.step = String(step);
+    q("pane1")[0].inert = step === 2;
+    q("pane2")[0].inert = step === 1;
+    el.destroy = promo.destroy;
     return el;
   }
 
@@ -1096,7 +1287,7 @@ const PhoneScreens = (() => {
     ? `Pay ${PLANS[k].claimB.pct}% less than buying ${PLANS[k].claimB.obj}`
     : PLANS[k].claimA.pre + PLANS[k].claimA.num + PLANS[k].claimA.post);
 
-  return { plan, original, claim, spring: SPRING };
+  return { plan, calm, original, claim, spring: SPRING };
 })();
 
 (() => {
@@ -1111,6 +1302,7 @@ const PhoneScreens = (() => {
     { id: "b", title: "Message B", sub: "Pay 98% less than buying it", x: 922, y: 1394 },
     { id: "bar", title: "Checkout bar", sub: "Total and Continue pinned", x: 922, y: 2508 },
     { id: "promo", title: "Promo code sheet", sub: "Example code WELCOME10", x: 922, y: 3622 },
+    { id: "calm", title: "Message A · Calm", sub: "Choose a plan, then review", x: 922, y: 4736 },
   ];
   const screens = [
     { id: "original", group: "original", name: "Original", message: "Wear it for 1.1% of its value", detail: "Callout · Single · Decluttered", node: "6218-47203", x: 280, y: 280 },
@@ -1126,9 +1318,12 @@ const PhoneScreens = (() => {
     { id: "promo-typing", group: "promo", name: "Promo · Typing", message: "Sheet open", detail: "Clear button and Apply on", cfg: { plan: "single", message: "a", promo: "typing" }, x: 1404, y: 3622 },
     { id: "promo-invalid", group: "promo", name: "Promo · Invalid code", message: "Sheet open", detail: "Red outline and a message under the field", cfg: { plan: "single", message: "a", promo: "invalid" }, x: 1886, y: 3622 },
     { id: "promo-applied", group: "promo", name: "Promo · Applied", message: "Sheet closed", detail: "Code in the row; first payment drops 10%", cfg: { plan: "single", message: "a", promo: "applied" }, x: 2368, y: 3622 },
+    { id: "calm-single", group: "calm", name: "Calm A · Choose · Single", message: "Wear it for 1.1% of its value", detail: "One headline, a plain plan list, one button", cfg: { calm: true, plan: "single", step: 1 }, x: 922, y: 4736 },
+    { id: "calm-stack", group: "calm", name: "Calm A · Choose · Stack", message: "Wear 3 for 0.7% of their value", detail: "Photos follow the plan", cfg: { calm: true, plan: "stack", step: 1 }, x: 1404, y: 4736 },
+    { id: "calm-review", group: "calm", name: "Calm A · Review · Single", message: "Review", detail: "Included, promo code, total and terms", cfg: { calm: true, plan: "single", step: 2 }, x: 1886, y: 4736 },
   ];
   const byId = Object.fromEntries(screens.map((s) => [s.id, s]));
-  const makeScreen = (s) => (s.cfg ? PhoneScreens.plan(s.cfg) : PhoneScreens.original());
+  const makeScreen = (s) => (s.cfg?.calm ? PhoneScreens.calm(s.cfg) : s.cfg ? PhoneScreens.plan(s.cfg) : PhoneScreens.original());
 
   const $ = (id) => document.getElementById(id);
   const viewport = $("viewport"), world = $("world"), zoomLevel = $("zoomLevel"), hint = $("hint");
@@ -1368,7 +1563,9 @@ const PhoneScreens = (() => {
   function renderInfo() {
     const s = screens[focusIdx];
     let title = s.name;
-    if (fState) {
+    if (fState && s.cfg.calm) {
+      title = `Calm A · ${fState.step === 2 ? "Review" : "Choose"} · ${PLAN_LABEL[fState.plan]}`;
+    } else if (fState) {
       const label = PLAN_LABEL[fState.plan], m = fState.message.toUpperCase();
       title = s.group === "promo" ? s.name : s.group === "bar" ? `Checkout bar · ${label}` : `${m} · ${label}`;
       seg.dataset.m = fState.message;
@@ -1380,9 +1577,10 @@ const PhoneScreens = (() => {
   function mountScreen() {
     const s = screens[focusIdx];
     liveScr?.destroy(); liveScr?.remove();
-    liveScr = fState
-      ? PhoneScreens.plan({ ...s.cfg, ...fState, onChange: (st) => { fState = st; renderInfo(); } })
-      : PhoneScreens.original();
+    const onChange = (st) => { fState = st; renderInfo(); };
+    liveScr = !fState ? PhoneScreens.original()
+      : s.cfg.calm ? PhoneScreens.calm({ ...s.cfg, ...fState, onChange })
+      : PhoneScreens.plan({ ...s.cfg, ...fState, onChange });
     liveScr.querySelector('[data-r="back"]')?.addEventListener("click", () => closeFocus());
     shot.prepend(liveScr);
     fitShot();
@@ -1391,10 +1589,14 @@ const PhoneScreens = (() => {
   function showScreen(i) {
     focusIdx = (i + screens.length) % screens.length;
     const s = screens[focusIdx];
-    fState = s.cfg ? { plan: s.cfg.plan, message: s.cfg.message } : null;
+    fState = !s.cfg ? null : s.cfg.calm ? { plan: s.cfg.plan, step: s.cfg.step } : { plan: s.cfg.plan, message: s.cfg.message };
     mountScreen();
     renderInfo();
-    seg.hidden = $("focusTry").hidden = !s.cfg;
+    seg.hidden = !s.cfg || !!s.cfg.calm;
+    $("focusTry").hidden = !s.cfg;
+    $("focusTry").textContent = s.cfg?.calm
+      ? "Pick a plan, then Continue to review. Example promo code: WELCOME10."
+      : "Tap a plan to switch between Single, Duo and Stack. Example promo code: WELCOME10.";
     $("counter").textContent = `${focusIdx + 1} of ${screens.length}`;
     $("frameLink").hidden = !s.node;
     if (s.node) $("frameLink").href = FIGMA + s.node;
@@ -1472,7 +1674,7 @@ const PhoneScreens = (() => {
     const inField = e.target.closest?.("input, textarea, [contenteditable]");
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (!focus.hidden) {
-      if (e.key === "Escape") { e.preventDefault(); if (!liveScr?.dismissSheet?.()) closeFocus(); }
+      if (e.key === "Escape") { e.preventDefault(); if (!liveScr?.dismissSheet?.() && !liveScr?.goBack?.()) closeFocus(); }
       else if (inField) return;
       else if (e.key === "ArrowRight") { e.preventDefault(); showScreen(focusIdx + 1); }
       else if (e.key === "ArrowLeft") { e.preventDefault(); showScreen(focusIdx - 1); }
