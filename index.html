@@ -1371,7 +1371,16 @@ const PhoneScreens = (() => {
   // "% of its value", no "up to", perks in two rows with the promo code under them, stacked photos.
   // Discount = 1 − (monthly price per piece ÷ this ring's AED 25,000), rounded down.
   const ONE_CLAIM = { single: ["Wear it for ", "98% off", " its retail price"], duo: ["Wear 2 pieces at ", "99% off", " each"], stack: ["Wear 3 pieces at ", "99% off", " each"] };
-  function one({ plan: startPlan = "single", onChange } = {}) {
+  // v2 (client, 28 Oct evening): retail = this piece, + AED 50,000 for Duo, + AED 100,000 for Stack, shown with "+"
+  // and never "up to"; the promo code sits just above the total; the retail value and % count more slowly.
+  const ONE2 = {
+    single: { retail: 25000, plus: false, pct: 98, pre: "Wear it for ", post: " its retail value" },
+    duo: { retail: 75000, plus: true, pct: 99, pre: "Wear 2 pieces for ", post: " their retail value" },
+    stack: { retail: 125000, plus: true, pct: 99, pre: "Wear 3 pieces for ", post: " their retail value" },
+  };
+  const ONE2_COUNT_MS = 900;
+  function one({ plan: startPlan = "single", v = 1, onChange } = {}) {
+    const v2 = v === 2;
     const el = document.createElement("div");
     el.className = "scr one";
     el.innerHTML = `
@@ -1386,7 +1395,7 @@ const PhoneScreens = (() => {
           </div>
           <div class="calm-piece">
             <h1>Limited Edition Diamond Ring</h1>
-            <p class="calm-retail"><span class="calm-retail-val">AED 25,000</span> retail value</p>
+            <p class="calm-retail"><span class="calm-retail-val" data-r="retailVal">AED 25,000</span> retail value</p>
           </div>
         </div>
         <p class="calm-claim"><span data-r="pre"></span><span class="calm-num" data-r="num"></span><span data-r="post"></span></p>
@@ -1404,8 +1413,9 @@ const PhoneScreens = (() => {
           ${PERK('<path d="M2.5 5h9v8.5h-9z"/><path d="M11.5 8h3.3l2.7 2.8v2.7h-6"/><circle cx="6" cy="15" r="1.6" fill="#ffffff"/><circle cx="14.5" cy="15" r="1.6" fill="#ffffff"/>', "Free unlimited delivery")}
           ${PERK('<circle cx="10" cy="10" r="7.5"/><path d="M8.2 7.6v4.8"/><path d="M11.8 7.6v4.8"/>', "Cancel or pause anytime")}
         </ul>
-        ${PROMO.replace('class="promo"', 'class="promo" style="margin-top: 20px"')}
+        ${v2 ? "" : PROMO.replace('class="promo"', 'class="promo" style="margin-top: 20px"')}
         <div class="grow"></div>
+        ${v2 ? PROMO.replace('class="promo"', 'class="promo" style="margin: 0 0 16px"') : ""}
         <div style="display: flex; flex-direction: column; gap: 2px">
           <p class="due-row"><span>Due once approved</span><span><span class="due-was" data-r="dueWas" hidden></span><span data-r="first"></span></span></p>
           <p class="sub">Then <span data-r="due"></span>/mo, incl. VAT</p>
@@ -1424,6 +1434,26 @@ const PhoneScreens = (() => {
     const promo = attachPromo(el, () => update(true));
     const STEP = 22;
 
+    // v2: the retail value and the % count from the old plan's numbers to the new one's over 900ms.
+    let shown = null, raf = 0;
+    function paintCount(t, s) {
+      set("retailVal", "AED " + s.retail.toLocaleString("en-US") + (t.plus ? "+" : ""));
+      set("num", s.pct + "% off");
+    }
+    function countTo(t, animate) {
+      cancelAnimationFrame(raf);
+      const from = shown || { retail: t.retail, pct: t.pct };
+      if (!animate || reduceMotion || !shown) { shown = { retail: t.retail, pct: t.pct }; paintCount(t, shown); return; }
+      const t0 = performance.now();
+      const tick = (now) => {
+        const k = Math.min(1, (now - t0) / ONE2_COUNT_MS), e = 1 - Math.pow(1 - k, 3);
+        shown = { retail: Math.round(from.retail + (t.retail - from.retail) * e), pct: Math.round(from.pct + (t.pct - from.pct) * e) };
+        paintCount(t, shown);
+        if (k < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+
     function update(animate) {
       const p = PLANS[key];
       const count = key === "single" ? 1 : key === "duo" ? 2 : 3;
@@ -1436,9 +1466,15 @@ const PhoneScreens = (() => {
       const stack = q("stack")[0];
       stack.style.width = 64 + STEP * (count - 1) + "px";
       stack.setAttribute("aria-label", count === 1 ? "Limited Edition Diamond Ring" : `Limited Edition Diamond Ring with ${count - 1} more piece${count > 2 ? "s" : ""} of your choice`);
-      const [pre, num, post] = ONE_CLAIM[key];
-      set("pre", pre); set("post", post);
-      q("num").forEach((n) => roll(n, num, animate));
+      if (v2) {
+        const t = ONE2[key];
+        set("pre", t.pre); set("post", t.post);
+        countTo(t, animate);
+      } else {
+        const [pre, num, post] = ONE_CLAIM[key];
+        set("pre", pre); set("post", post);
+        q("num").forEach((n) => roll(n, num, animate));
+      }
       promo.render(p.due, animate, 0);
       set("cta", p.cta);
       el.querySelectorAll(".calm-row").forEach((r) => r.setAttribute("aria-checked", String(r.dataset.plan === key)));
@@ -1453,7 +1489,7 @@ const PhoneScreens = (() => {
     el.goBack = () => false;
 
     update(false);
-    el.destroy = promo.destroy;
+    el.destroy = () => { cancelAnimationFrame(raf); promo.destroy(); };
     return el;
   }
 
@@ -1519,6 +1555,7 @@ const PhoneScreens = (() => {
     { id: "calm", title: "Message A · Calm", sub: "Choose a plan, then review", x: 922, y: 4736 },
     { id: "calmThumb", title: "Calm · Small photo", sub: "More room for the plans and the payment", x: 922, y: 5850 },
     { id: "one", title: "Calm · One screen", sub: "Client feedback 28 Oct · straight on to payment", x: 922, y: 6964 },
+    { id: "one2", title: "Calm · One screen v2", sub: "Slower count · promo above the total · retail value with +", x: 922, y: 8078 },
   ];
   const screens = [
     { id: "original", group: "original", name: "Original", message: "Wear it for 1.1% of its value", detail: "Callout · Single · Decluttered", node: "6218-47203", x: 280, y: 280 },
@@ -1543,6 +1580,9 @@ const PhoneScreens = (() => {
     { id: "one-single", group: "one", node: "6236-726", name: "Calm · One screen · Single", message: "Wear it for 98% off its retail price", detail: "Plan, perks, promo, total and terms on one screen", cfg: { one: true, plan: "single" }, x: 922, y: 6964 },
     { id: "one-duo", group: "one", node: "6236-825", name: "Calm · One screen · Duo", message: "Wear 2 pieces at 99% off each", detail: "Two photos stacked", cfg: { one: true, plan: "duo" }, x: 1404, y: 6964 },
     { id: "one-stack", group: "one", node: "6236-925", name: "Calm · One screen · Stack", message: "Wear 3 pieces at 99% off each", detail: "Three photos stacked", cfg: { one: true, plan: "stack" }, x: 1886, y: 6964 },
+    { id: "one2-single", group: "one2", name: "Calm · One screen v2 · Single", message: "Wear it for 98% off its retail value", detail: "AED 25,000 retail value; promo code just above the total", cfg: { one: true, v: 2, plan: "single" }, x: 922, y: 8078 },
+    { id: "one2-duo", group: "one2", name: "Calm · One screen v2 · Duo", message: "Wear 2 pieces for 99% off their retail value", detail: "AED 75,000+ retail value", cfg: { one: true, v: 2, plan: "duo" }, x: 1404, y: 8078 },
+    { id: "one2-stack", group: "one2", name: "Calm · One screen v2 · Stack", message: "Wear 3 pieces for 99% off their retail value", detail: "AED 125,000+ retail value", cfg: { one: true, v: 2, plan: "stack" }, x: 1886, y: 8078 },
   ];
   const byId = Object.fromEntries(screens.map((s) => [s.id, s]));
   const makeScreen = (s) => (s.cfg?.one ? PhoneScreens.one(s.cfg) : s.cfg?.calm ? PhoneScreens.calm(s.cfg) : s.cfg ? PhoneScreens.plan(s.cfg) : PhoneScreens.original());
@@ -1786,7 +1826,7 @@ const PhoneScreens = (() => {
     const s = screens[focusIdx];
     let title = s.name;
     if (fState && s.cfg.one) {
-      title = `Calm · One screen · ${PLAN_LABEL[fState.plan]}`;
+      title = `Calm · One screen${s.cfg.v === 2 ? " v2" : ""} · ${PLAN_LABEL[fState.plan]}`;
     } else if (fState && s.cfg.calm) {
       title = s.cfg.photo === "thumb"
         ? `Calm A · Small photo · ${fState.step === 2 ? "Checkout" : PLAN_LABEL[fState.plan]}`
