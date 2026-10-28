@@ -410,7 +410,7 @@ svg { display: block; }
 .calm-piece h1 { font-size: 15px; line-height: 20px; font-weight: 500; }
 .calm-piece h1 span { font-weight: 400; color: #5c5c5c; }
 .calm-retail { font-size: 13px; line-height: 18px; color: #5c5c5c; font-variant-numeric: tabular-nums; }
-.calm-claim { margin-top: 32px; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.015em; color: #0a0a0a; }
+.calm-claim { margin-top: 28px; font-size: 16px; line-height: 22px; font-weight: 500; letter-spacing: -0.01em; color: #3a3a3a; }
 .calm-num { color: #284423; font-variant-numeric: tabular-nums; }
 .calm-list { margin-top: 14px; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.09); overflow: hidden; }
 .calm-row {
@@ -428,18 +428,18 @@ svg { display: block; }
 .calm-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .calm-row-name { font-size: 16px; line-height: 22px; font-weight: 500; }
 .calm-row-sub { font-size: 13px; line-height: 18px; color: #5c5c5c; }
-.calm-row-price { font-size: 15px; line-height: 20px; font-weight: 400; color: #0a0a0a; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.calm-row-price small { font-size: 13px; color: #5c5c5c; }
+.calm-row-price { font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; color: #0a0a0a; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.calm-row-price small { margin-left: 1px; font-size: 13px; font-weight: 400; letter-spacing: 0; color: #5c5c5c; }
 
 .calm-bar { height: 44px; flex-shrink: 0; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; padding: 0 8px; }
 .calm-bar h2 { margin: 0; text-align: center; font-size: 17px; line-height: 22px; font-weight: 500; }
-.calm-summary { margin-top: 8px; display: flex; align-items: center; gap: 14px; }
+.calm-summary { margin-top: 12px; display: flex; align-items: center; gap: 14px; }
 .calm-thumb { width: 56px; height: 56px; flex: none; border-radius: 12px; object-fit: cover; object-position: 50% 30%; background: #2a2b2d; }
 .calm-sum-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .calm-sum-name { font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.01em; }
 .calm-sum-sub { font-size: 14px; line-height: 20px; color: #5c5c5c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .calm-change { height: 44px; padding: 0 4px; border: 0; background: transparent; font-size: 15px; font-weight: 500; color: #284423 !important; cursor: pointer; }
-.calm-rule { height: 1px; margin: 20px 0 0; background: rgba(0, 0, 0, 0.07); border: 0; }
+.calm-rule { height: 1px; margin: 16px 0 0; background: rgba(0, 0, 0, 0.07); border: 0; }
 .calm-included { margin-top: 16px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 20px; color: #5c5c5c; }
 .calm-included li { display: flex; align-items: center; gap: 12px; }
 .calm-included svg { flex: none; }
@@ -1130,11 +1130,12 @@ const PhoneScreens = (() => {
 
   // Calm A: the same offer as Message A, split into "choose a plan" and "review".
   const PLAN_SUB = { single: "1 piece at a time", duo: "2 pieces at a time", stack: "3 pieces at a time" };
-  const CALM_PERK = (d, label) => `<li><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#8a8a8a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg><span>${label}</span></li>`;
+  // 20 × 20 icons drawn on a 20 grid at a 1.5 stroke, the same as the other 20px icons in the screens.
+  const CALM_PERK = (d, label) => `<li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#8a8a8a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg><span>${label}</span></li>`;
   function calm({ plan: startPlan = "single", step: startStep = 1, onChange } = {}) {
     const el = document.createElement("div");
     el.className = "scr";
-    const photoH = 220;
+    const photoH = 220, reviewH = 150;
     el.innerHTML = `
       ${STATUS}
       <div class="calm-stack">
@@ -1169,8 +1170,12 @@ const PhoneScreens = (() => {
             <h2>Review</h2><span></span>
           </div>
           <main class="calm-main">
+            <div class="photos" role="img" data-r="photos2" style="height: ${reviewH}px">
+              <img class="ic-photo" data-q="riviere" src="${IMG.riviere}" alt="" draggable="false">
+              <img class="ic-photo" data-q="pendant" src="${IMG.pendant}" alt="" draggable="false">
+              <img class="ic-photo" data-q="ring" src="${IMG.ring}" alt="" draggable="false">
+            </div>
             <div class="calm-summary">
-              <img class="calm-thumb" src="${IMG.ring}" alt="" draggable="false">
               <div class="calm-sum-text"><p class="calm-sum-name" data-r="sumName"></p><p class="calm-sum-sub" data-r="sumSub"></p></div>
               <button type="button" class="calm-change" data-r="prev">Change</button>
             </div>
@@ -1199,6 +1204,7 @@ const PhoneScreens = (() => {
     const q = (r) => [...el.querySelectorAll(`[data-r="${r}"]`)];
     const set = (r, text) => q(r).forEach((n) => { n.textContent = text; });
     const imgs = Object.fromEntries([...el.querySelectorAll("[data-p]")].map((n) => [n.dataset.p, n]));
+    const imgs2 = Object.fromEntries([...el.querySelectorAll("[data-q]")].map((n) => [n.dataset.q, n]));
     let key = PLANS[startPlan] ? startPlan : "single";
     let step = startStep === 2 ? 2 : 1;
     const promo = attachPromo(el, () => update(true));
@@ -1210,7 +1216,15 @@ const PhoneScreens = (() => {
         const f = frames[name];
         Object.assign(img.style, { left: f.l + "px", top: f.t + "px", width: f.w + "px", height: f.h + "px", opacity: f.o, objectPosition: centre(f, ...SOURCES[name]) });
       }
-      q("photos")[0].setAttribute("aria-label", key === "single" ? "Limited Edition Diamond Ring" : key === "duo" ? "Limited Edition Diamond Ring beside a second piece" : "Limited Edition Diamond Ring in the centre of three pieces");
+      // Review shows the same pieces, shorter, so the plan is still about jewellery.
+      const frames2 = photoFrames(key, reviewH);
+      for (const [name, img] of Object.entries(imgs2)) {
+        const f = frames2[name];
+        Object.assign(img.style, { left: f.l + "px", top: f.t + "px", width: f.w + "px", height: f.h + "px", opacity: f.o, objectPosition: centre(f, ...SOURCES[name]) });
+      }
+      const photoLabel = key === "single" ? "Limited Edition Diamond Ring" : key === "duo" ? "Limited Edition Diamond Ring beside a second piece" : "Limited Edition Diamond Ring in the centre of three pieces";
+      q("photos")[0].setAttribute("aria-label", photoLabel);
+      q("photos2")[0].setAttribute("aria-label", photoLabel);
       set("extra", p.nameExtra);
       set("prefix", p.retailPrefix);
       set("retail", p.retail);
