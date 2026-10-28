@@ -808,7 +808,8 @@ const PhoneScreens = (() => {
 
   // Rolling numerals: characters that changed slide out and the new ones slide in,
   // upwards when the value grows and downwards when it shrinks.
-  function roll(node, text, animate) {
+  // `offset` delays this number so several values can roll in sequence rather than all at once.
+  function roll(node, text, animate, offset = 0) {
     const prev = node.dataset.v;
     node.dataset.v = text;
     node.setAttribute("aria-label", text);
@@ -833,7 +834,7 @@ const PhoneScreens = (() => {
       node.append(slot);
       if (was === ch) { slot.textContent = ch; return; }
       slot.classList.add("rs");
-      const delay = changed++ * 16;
+      const delay = offset + changed++ * 16;
       const inEl = document.createElement("span");
       inEl.className = "rd";
       inEl.textContent = ch;
@@ -988,9 +989,9 @@ const PhoneScreens = (() => {
         }
       },
       // Row, struck-through original and first payment for the plan's monthly price.
-      render(due, animate) {
+      render(due, animate, offset = 0) {
         const first = applied ? Math.round(amount(due) * (1 - PROMO_OFF) * 100) / 100 : amount(due);
-        q("first").forEach((n) => roll(n, money(first), animate));
+        q("first").forEach((n) => roll(n, money(first), animate, offset));
         q("due").forEach((n) => roll(n, due, false));
         q("dueWas").forEach((n) => { n.hidden = !applied; n.textContent = due; });
         q("promoRow").forEach((r) => r.classList.toggle("is-applied", !!applied));
@@ -1089,12 +1090,12 @@ const PhoneScreens = (() => {
       set("prefix", p.retailPrefix);
       q("retail").forEach((n) => roll(n, p.retail, animate));
       set("pre", p.claimA.pre); set("post", p.claimA.post);
-      q("num").forEach((n) => roll(n, p.claimA.num, animate));
+      q("num").forEach((n) => roll(n, p.claimA.num, animate, 40));
       set("obj", p.claimB.obj);
       if (message === "b") q("claim")[0].setAttribute("aria-label", `Pay ${p.claimB.pct}% less than buying ${p.claimB.obj}`);
-      if (!counting) q("count").forEach((n) => roll(n, p.claimB.pct + "%", animate));
+      if (!counting) q("count").forEach((n) => roll(n, p.claimB.pct + "%", animate, 40));
       // The first payment rolls (and drops when a code is applied); the "Then …/mo" line just swaps.
-      promo.render(p.due, animate);
+      promo.render(p.due, animate, 80);
       set("cta", p.cta);
       el.querySelectorAll(".tile").forEach((t) => t.setAttribute("aria-checked", String(t.dataset.plan === key)));
     }
@@ -1279,18 +1280,20 @@ const PhoneScreens = (() => {
       // Small-photo checkout: the first payment broken into plan and VAT.
       const net = amount(p.price), dueAmt = amount(p.due);
       set("netLabel", `${p.label} plan, monthly`);
-      set("net", money(net));
-      set("vat", money(Math.round((dueAmt - net) * 100) / 100));
+      q("net").forEach((n) => roll(n, money(net), animate, 80));
+      q("vat").forEach((n) => roll(n, money(Math.round((dueAmt - net) * 100) / 100), animate, 80));
       set("dueText", p.due);
       set("extra", p.nameExtra);
       set("prefix", p.retailPrefix);
-      set("retail", p.retail);
-      set("pre", p.claimA.pre); set("num", p.claimA.num); set("post", p.claimA.post);
+      // Like iOS numeric text: the retail value leads, the percentage follows, then the total.
+      q("retail").forEach((n) => roll(n, p.retail, animate));
+      set("pre", p.claimA.pre); set("post", p.claimA.post);
+      q("num").forEach((n) => roll(n, p.claimA.num, animate, 40));
       set("sumName", `${p.label} plan`);
       set("sumSub", `${PLAN_SUB[key][0].toUpperCase() + PLAN_SUB[key].slice(1)} · ${p.price}/mo`);
       set("cta", p.cta);
-      promo.render(p.due, animate);
-      q("firstText").forEach((n) => { n.textContent = q("first")[0]?.dataset.v || p.due; });
+      promo.render(p.due, animate, 80);
+      q("firstText").forEach((n) => roll(n, q("first")[0]?.dataset.v || p.due, animate, 80));
       el.querySelectorAll(".calm-row").forEach((r) => r.setAttribute("aria-checked", String(r.dataset.plan === key)));
     }
     function setStep(n) {
@@ -1303,7 +1306,7 @@ const PhoneScreens = (() => {
 
     el.addEventListener("click", (e) => {
       const row = e.target.closest(".calm-row");
-      if (row && row.dataset.plan !== key) { key = row.dataset.plan; update(false); onChange?.({ plan: key, step }); }
+      if (row && row.dataset.plan !== key) { key = row.dataset.plan; update(true); onChange?.({ plan: key, step }); }
       if (e.target.closest('[data-r="next"]')) setStep(2);
       if (e.target.closest('[data-r="prev"]')) setStep(1);
       if (e.target.closest('a[href^="#"]')) e.preventDefault();
