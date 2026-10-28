@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Iconec plan selection: live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet and a calmer two-step A.">
+<meta name="description" content="Iconec plan selection: live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet, a calmer two-step A and a one-screen version.">
 <meta property="og:title" content="Iconec · Plan selection">
-<meta property="og:description" content="Live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet and a calmer two-step A.">
+<meta property="og:description" content="Live, tappable iPhone screens for Message A and B, the checkout bar, the promo code sheet, a calmer two-step A and a one-screen version.">
 <meta name="theme-color" content="#ecede9">
 <title>Iconec · Plan selection</title>
 <style>
@@ -459,6 +459,21 @@ svg { display: block; }
 .is-thumb .calm-row { height: 76px; }
 .calm-included-first { margin-top: 32px; gap: 12px; }
 .calm-ledger-first { margin-bottom: 14px; display: flex; flex-direction: column; gap: 2px; }
+
+/* ---------- Calm · One screen (client feedback 28 Oct) ----------
+   Everything on one screen before payment. The ring's thumbnail stays in front;
+   the pieces a plan adds slide out from behind it. */
+.one-stack { position: relative; height: 64px; flex: none; transition: width var(--dur-move) var(--ease-out); }
+.one-thumb {
+  position: absolute; top: 0; left: 0; width: 64px; height: 64px; display: block; border-radius: 12px;
+  object-fit: cover; background: #2a2b2d; box-shadow: 0 0 0 2px #ffffff; -webkit-user-drag: none;
+  transition: left var(--dur-move) var(--ease-out), opacity 200ms ease-out, transform var(--dur-move) var(--ease-out);
+}
+.one .calm-claim { margin-top: 28px; font-size: 16px; line-height: 22px; }
+.one .calm-num { font-weight: 600; }
+.one .calm-list { margin-top: 12px; }
+.one .perks { color: #5c5c5c; }
+.one .perks svg { stroke: #8a8a8a; }
 .calm-breakdown { margin-top: 16px; display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
 .calm-line { display: flex; justify-content: space-between; font-size: 14px; line-height: 20px; color: #5c5c5c; }
 .calm-breakdown .due-row { color: #0a0a0a; }
@@ -1352,6 +1367,96 @@ const PhoneScreens = (() => {
     return el;
   }
 
+  // Calm, one screen (client feedback 28 Oct): no extra step before payment, a discount instead of
+  // "% of its value", no "up to", perks in two rows with the promo code under them, stacked photos.
+  // Discount = 1 − (monthly price per piece ÷ this ring's AED 25,000), rounded down.
+  const ONE_CLAIM = { single: ["Wear it for ", "98% off", " its retail price"], duo: ["Wear 2 pieces at ", "99% off", " each"], stack: ["Wear 3 pieces at ", "99% off", " each"] };
+  function one({ plan: startPlan = "single", onChange } = {}) {
+    const el = document.createElement("div");
+    el.className = "scr one";
+    el.innerHTML = `
+      ${STATUS}
+      <div class="nav"><button type="button" class="nav-back" aria-label="Back" data-r="back">${BACK("M15 5l-7 7 7 7")}</button></div>
+      <main class="calm-main">
+        <div class="calm-head">
+          <div class="one-stack" role="img" data-r="stack">
+            <img class="one-thumb" data-p="riviere" src="${IMG.riviere}" alt="" draggable="false">
+            <img class="one-thumb" data-p="pendant" src="${IMG.pendant}" alt="" draggable="false">
+            <img class="one-thumb" data-p="ring" src="${IMG.ring}" alt="" draggable="false">
+          </div>
+          <div class="calm-piece">
+            <h1>Limited Edition Diamond Ring</h1>
+            <p class="calm-retail"><span class="calm-retail-val">AED 25,000</span> retail value</p>
+          </div>
+        </div>
+        <p class="calm-claim"><span data-r="pre"></span><span class="calm-num" data-r="num"></span><span data-r="post"></span></p>
+        <div class="calm-list" role="radiogroup" aria-label="Plan">
+          ${["single", "duo", "stack"].map((k) => `
+            <button type="button" class="calm-row" role="radio" aria-checked="false" data-plan="${k}">
+              <span class="calm-radio" aria-hidden="true"></span>
+              <span class="calm-row-text"><span class="calm-row-name">${PLANS[k].label}</span><span class="calm-row-sub">${PLAN_SUB[k]}</span></span>
+              <span class="calm-row-price">${PLANS[k].price}<small>/mo</small></span>
+            </button>`).join("")}
+        </div>
+        <ul class="perks" aria-label="Included with every plan">
+          ${PERK('<path d="M3.5 7h12l-3.2-3.2"/><path d="M16.5 13h-12l3.2 3.2"/>', "Unlimited swaps")}
+          ${PERK('<path d="M10 2.5l6 2.2v4.7c0 3.8-2.6 6.5-6 8.1-3.4-1.6-6-4.3-6-8.1V4.7z"/><path d="M7.4 10.1l1.9 1.9 3.4-3.6"/>', "Damage fully covered")}
+          ${PERK('<path d="M2.5 5h9v8.5h-9z"/><path d="M11.5 8h3.3l2.7 2.8v2.7h-6"/><circle cx="6" cy="15" r="1.6" fill="#ffffff"/><circle cx="14.5" cy="15" r="1.6" fill="#ffffff"/>', "Free unlimited delivery")}
+          ${PERK('<circle cx="10" cy="10" r="7.5"/><path d="M8.2 7.6v4.8"/><path d="M11.8 7.6v4.8"/>', "Cancel or pause anytime")}
+        </ul>
+        ${PROMO.replace('class="promo"', 'class="promo" style="margin-top: 20px"')}
+        <div class="grow"></div>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <p class="due-row"><span>Due once approved</span><span><span class="due-was" data-r="dueWas" hidden></span><span data-r="first"></span></span></p>
+          <p class="sub">Then <span data-r="due"></span>/mo, incl. VAT</p>
+        </div>
+        ${TERMS}
+        <button type="button" class="cta" style="margin-top: 12px" data-r="cta"></button>
+        <p class="fine" style="margin-top: 8px">Nothing is charged until your membership is approved.</p>
+      </main>
+      ${SHEET}
+      ${HOME}`;
+
+    const q = (r) => [...el.querySelectorAll(`[data-r="${r}"]`)];
+    const set = (r, text) => q(r).forEach((n) => { n.textContent = text; });
+    const thumbs = Object.fromEntries([...el.querySelectorAll("[data-p]")].map((n) => [n.dataset.p, n]));
+    let key = PLANS[startPlan] ? startPlan : "single";
+    const promo = attachPromo(el, () => update(true));
+    const STEP = 22;
+
+    function update(animate) {
+      const p = PLANS[key];
+      const count = key === "single" ? 1 : key === "duo" ? 2 : 3;
+      // The ring stays in front; each added piece slides out 22px from behind the one before it.
+      const at = { ring: [0, true, 3], pendant: [STEP, count > 1, 2], riviere: [STEP * 2, count > 2, 1] };
+      for (const [name, img] of Object.entries(thumbs)) {
+        const [l, on, z] = at[name];
+        Object.assign(img.style, { left: (on ? l : 0) + "px", opacity: on ? 1 : 0, transform: on ? "none" : "scale(0.9)", zIndex: z, objectPosition: centre({ w: 64, h: 64 }, ...SOURCES[name]) });
+      }
+      const stack = q("stack")[0];
+      stack.style.width = 64 + STEP * (count - 1) + "px";
+      stack.setAttribute("aria-label", count === 1 ? "Limited Edition Diamond Ring" : `Limited Edition Diamond Ring with ${count - 1} more piece${count > 2 ? "s" : ""} of your choice`);
+      const [pre, num, post] = ONE_CLAIM[key];
+      set("pre", pre); set("post", post);
+      q("num").forEach((n) => roll(n, num, animate));
+      promo.render(p.due, animate, 0);
+      set("cta", p.cta);
+      el.querySelectorAll(".calm-row").forEach((r) => r.setAttribute("aria-checked", String(r.dataset.plan === key)));
+    }
+
+    el.addEventListener("click", (e) => {
+      const row = e.target.closest(".calm-row");
+      if (row && row.dataset.plan !== key) { key = row.dataset.plan; update(true); onChange?.({ plan: key }); }
+      if (e.target.closest('a[href^="#"]')) e.preventDefault();
+    });
+    el.dismissSheet = promo.dismiss;
+    el.goBack = () => false;
+
+    update(false);
+    el.destroy = promo.destroy;
+    return el;
+  }
+
   function original() {
     const el = document.createElement("div");
     el.className = "scr";
@@ -1396,7 +1501,7 @@ const PhoneScreens = (() => {
     ? `Pay ${PLANS[k].claimB.pct}% less than buying ${PLANS[k].claimB.obj}`
     : PLANS[k].claimA.pre + PLANS[k].claimA.num + PLANS[k].claimA.post);
 
-  return { plan, calm, original, claim, spring: SPRING };
+  return { plan, calm, one, original, claim, spring: SPRING };
 })();
 
 (() => {
@@ -1413,6 +1518,7 @@ const PhoneScreens = (() => {
     { id: "promo", title: "Promo code sheet", sub: "Example code WELCOME10", x: 922, y: 3622 },
     { id: "calm", title: "Message A · Calm", sub: "Choose a plan, then review", x: 922, y: 4736 },
     { id: "calmThumb", title: "Calm · Small photo", sub: "More room for the plans and the payment", x: 922, y: 5850 },
+    { id: "one", title: "Calm · One screen", sub: "Client feedback 28 Oct · straight on to payment", x: 922, y: 6964 },
   ];
   const screens = [
     { id: "original", group: "original", name: "Original", message: "Wear it for 1.1% of its value", detail: "Callout · Single · Decluttered", node: "6218-47203", x: 280, y: 280 },
@@ -1434,9 +1540,12 @@ const PhoneScreens = (() => {
     { id: "calm-thumb-single", group: "calmThumb", name: "Calm A · Small photo · Single", message: "Wear it for 1.1% of its value", detail: "Thumbnail, taller plan rows, included and total", cfg: { calm: true, plan: "single", step: 1, photo: "thumb" }, x: 922, y: 5850 },
     { id: "calm-thumb-stack", group: "calmThumb", name: "Calm A · Small photo · Stack", message: "Wear 3 for 0.7% of their value", detail: "+2 badge on the thumbnail", cfg: { calm: true, plan: "stack", step: 1, photo: "thumb" }, x: 1404, y: 5850 },
     { id: "calm-thumb-review", group: "calmThumb", name: "Calm A · Small photo · Checkout", message: "Checkout", detail: "Payment breakdown, what happens next", cfg: { calm: true, plan: "single", step: 2, photo: "thumb" }, x: 1886, y: 5850 },
+    { id: "one-single", group: "one", node: "6236-726", name: "Calm · One screen · Single", message: "Wear it for 98% off its retail price", detail: "Plan, perks, promo, total and terms on one screen", cfg: { one: true, plan: "single" }, x: 922, y: 6964 },
+    { id: "one-duo", group: "one", node: "6236-825", name: "Calm · One screen · Duo", message: "Wear 2 pieces at 99% off each", detail: "Two photos stacked", cfg: { one: true, plan: "duo" }, x: 1404, y: 6964 },
+    { id: "one-stack", group: "one", node: "6236-925", name: "Calm · One screen · Stack", message: "Wear 3 pieces at 99% off each", detail: "Three photos stacked", cfg: { one: true, plan: "stack" }, x: 1886, y: 6964 },
   ];
   const byId = Object.fromEntries(screens.map((s) => [s.id, s]));
-  const makeScreen = (s) => (s.cfg?.calm ? PhoneScreens.calm(s.cfg) : s.cfg ? PhoneScreens.plan(s.cfg) : PhoneScreens.original());
+  const makeScreen = (s) => (s.cfg?.one ? PhoneScreens.one(s.cfg) : s.cfg?.calm ? PhoneScreens.calm(s.cfg) : s.cfg ? PhoneScreens.plan(s.cfg) : PhoneScreens.original());
 
   const $ = (id) => document.getElementById(id);
   const viewport = $("viewport"), world = $("world"), zoomLevel = $("zoomLevel"), hint = $("hint");
@@ -1676,7 +1785,9 @@ const PhoneScreens = (() => {
   function renderInfo() {
     const s = screens[focusIdx];
     let title = s.name;
-    if (fState && s.cfg.calm) {
+    if (fState && s.cfg.one) {
+      title = `Calm · One screen · ${PLAN_LABEL[fState.plan]}`;
+    } else if (fState && s.cfg.calm) {
       title = s.cfg.photo === "thumb"
         ? `Calm A · Small photo · ${fState.step === 2 ? "Checkout" : PLAN_LABEL[fState.plan]}`
         : `Calm A · ${fState.step === 2 ? "Review" : "Choose"} · ${PLAN_LABEL[fState.plan]}`;
@@ -1694,6 +1805,7 @@ const PhoneScreens = (() => {
     liveScr?.destroy(); liveScr?.remove();
     const onChange = (st) => { fState = st; renderInfo(); };
     liveScr = !fState ? PhoneScreens.original()
+      : s.cfg.one ? PhoneScreens.one({ ...s.cfg, ...fState, onChange })
       : s.cfg.calm ? PhoneScreens.calm({ ...s.cfg, ...fState, onChange })
       : PhoneScreens.plan({ ...s.cfg, ...fState, onChange });
     liveScr.querySelector('[data-r="back"]')?.addEventListener("click", () => closeFocus());
@@ -1704,12 +1816,14 @@ const PhoneScreens = (() => {
   function showScreen(i) {
     focusIdx = (i + screens.length) % screens.length;
     const s = screens[focusIdx];
-    fState = !s.cfg ? null : s.cfg.calm ? { plan: s.cfg.plan, step: s.cfg.step } : { plan: s.cfg.plan, message: s.cfg.message };
+    fState = !s.cfg ? null : s.cfg.one ? { plan: s.cfg.plan } : s.cfg.calm ? { plan: s.cfg.plan, step: s.cfg.step } : { plan: s.cfg.plan, message: s.cfg.message };
     mountScreen();
     renderInfo();
-    seg.hidden = !s.cfg || !!s.cfg.calm;
+    seg.hidden = !s.cfg || !!s.cfg.calm || !!s.cfg.one;
     $("focusTry").hidden = !s.cfg;
-    $("focusTry").textContent = s.cfg?.calm
+    $("focusTry").textContent = s.cfg?.one
+      ? "Tap a plan to see the photos stack. Example promo code: WELCOME10."
+      : s.cfg?.calm
       ? "Pick a plan, then Continue to review. Example promo code: WELCOME10."
       : "Tap a plan to switch between Single, Duo and Stack. Example promo code: WELCOME10.";
     $("counter").textContent = `${focusIdx + 1} of ${screens.length}`;
