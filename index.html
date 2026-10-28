@@ -1156,6 +1156,39 @@ const PhoneScreens = (() => {
   const PLAN_SUB = { single: "1 piece at a time", duo: "2 pieces at a time", stack: "3 pieces at a time" };
   // 24 × 24 icons from the 20 grid at a 1.25 stroke (1.5 once scaled), as in the Design canvas.
   const CALM_PERK = (d, label) => `<li><svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="#8a8a8a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg><span>${label}</span></li>`;
+  // The thumbnail badge: its count rolls like the total, it springs in when a second piece
+  // joins the plan, and it leaves with a short ease-in when you go back to Single.
+  const BADGE_DELAY = 60;
+  function updateBadge(more, key, animate) {
+    const show = key !== "single";
+    const wasShown = !more.hidden;
+    more.getAnimations().forEach((a) => a.cancel());
+    const label = key === "duo" ? "Plus 1 more piece" : "Plus 2 more pieces";
+    const moving = animate && !reduceMotion && typeof more.animate === "function";
+    if (show) {
+      more.hidden = false;
+      roll(more, key === "duo" ? "+1" : "+2", moving && wasShown, BADGE_DELAY);
+      more.setAttribute("aria-label", label);
+      if (moving && !wasShown) {
+        more.animate(
+          [{ transform: "scale(0.5)", opacity: 0 }, { transform: "none", opacity: 1 }],
+          { duration: SPRING.dur, easing: SPRING.easing, delay: BADGE_DELAY, fill: "backwards" }
+        );
+      }
+    } else if (moving && wasShown) {
+      const exit = more.animate(
+        [{ transform: "none", opacity: 1 }, { transform: "scale(0.5)", opacity: 0 }],
+        { duration: 160, easing: "cubic-bezier(0.55, 0, 1, 0.45)", delay: BADGE_DELAY, fill: "forwards" }
+      );
+      // A timer as well as onfinish, so the badge still hides if the page's animation clock is paused.
+      const done = () => { if (exit.playState !== "idle") { more.hidden = true; exit.cancel(); } };
+      exit.onfinish = done;
+      setTimeout(done, BADGE_DELAY + 200);
+    } else {
+      more.hidden = true;
+    }
+  }
+
   function calm({ plan: startPlan = "single", step: startStep = 1, photo = "large", onChange } = {}) {
     const el = document.createElement("div");
     el.className = "scr";
@@ -1271,29 +1304,25 @@ const PhoneScreens = (() => {
         Object.assign(img.style, { left: f.l + "px", top: f.t + "px", width: f.w + "px", height: f.h + "px", opacity: f.o, objectPosition: centre(f, ...SOURCES[name]) });
       }
       q("photos")[0]?.setAttribute("aria-label", key === "single" ? "Limited Edition Diamond Ring" : key === "duo" ? "Limited Edition Diamond Ring beside a second piece" : "Limited Edition Diamond Ring in the centre of three pieces");
-      // Review keeps the piece in view as a thumbnail; Duo and Stack count the pieces still to pick.
-      q("more").forEach((more) => {
-        more.hidden = key === "single";
-        more.textContent = key === "duo" ? "+1" : "+2";
-        more.setAttribute("aria-label", key === "duo" ? "Plus 1 more piece" : "Plus 2 more pieces");
-      });
+      // Only two things move when the plan changes: the total at the bottom rolls first,
+      // then the thumbnail's +1 / +2 badge follows. Everything else swaps instantly.
+      promo.render(p.due, animate, 0);
+      q("more").forEach((more) => updateBadge(more, key, animate));
       // Small-photo checkout: the first payment broken into plan and VAT.
       const net = amount(p.price), dueAmt = amount(p.due);
       set("netLabel", `${p.label} plan, monthly`);
-      q("net").forEach((n) => roll(n, money(net), animate, 80));
-      q("vat").forEach((n) => roll(n, money(Math.round((dueAmt - net) * 100) / 100), animate, 80));
+      q("net").forEach((n) => roll(n, money(net), false));
+      q("vat").forEach((n) => roll(n, money(Math.round((dueAmt - net) * 100) / 100), false));
       set("dueText", p.due);
       set("extra", p.nameExtra);
       set("prefix", p.retailPrefix);
-      // Like iOS numeric text: the retail value leads, the percentage follows, then the total.
-      q("retail").forEach((n) => roll(n, p.retail, animate));
+      q("retail").forEach((n) => roll(n, p.retail, false));
       set("pre", p.claimA.pre); set("post", p.claimA.post);
-      q("num").forEach((n) => roll(n, p.claimA.num, animate, 40));
+      q("num").forEach((n) => roll(n, p.claimA.num, false));
       set("sumName", `${p.label} plan`);
       set("sumSub", `${PLAN_SUB[key][0].toUpperCase() + PLAN_SUB[key].slice(1)} · ${p.price}/mo`);
       set("cta", p.cta);
-      promo.render(p.due, animate, 80);
-      q("firstText").forEach((n) => roll(n, q("first")[0]?.dataset.v || p.due, animate, 80));
+      q("firstText").forEach((n) => roll(n, q("first")[0]?.dataset.v || p.due, false));
       el.querySelectorAll(".calm-row").forEach((r) => r.setAttribute("aria-checked", String(r.dataset.plan === key)));
     }
     function setStep(n) {
